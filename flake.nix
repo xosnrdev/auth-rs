@@ -102,10 +102,12 @@
             pkgs.cargo-release
             pkgs.cargo-sort
             pkgs.cargo-deny
+            pkgs.cargo-audit
             pkgs.rustc
             pkgs.cargo
             pkgs.rustfmt
             pkgs.clippy
+            pkgs.cargo-edit
           ];
 
           shellHook = ''

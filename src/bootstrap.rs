@@ -181,11 +181,12 @@ pub fn create_router(db_pool: PgPool, config: AppConfig) -> Router {
         .route("/register", post(register))
         .route("/", get(get_all_users))
         .route("/me", get(get_me))
+        .route("/me", patch(update_me))
+        .route("/me", delete(delete_me))
+        .without_v07_checks()
         .route("/:id", get(get_user))
         .route("/:id", patch(update_user))
-        .route("/me", patch(update_me))
-        .route("/:id", delete(delete_user))
-        .route("/me", delete(delete_me));
+        .route("/:id", delete(delete_user));
 
     let auth_router = Router::new()
         .route("/login", post(login))
@@ -195,13 +196,15 @@ pub fn create_router(db_pool: PgPool, config: AppConfig) -> Router {
         .route("/refresh-cookie", post(refresh_session_by_cookie))
         .route("/refresh", post(refresh_session_by_body))
         .route("/current", patch(revoke_my_session))
-        .route("/:id", patch(revoke_user_session))
-        .route("/", patch(revoke_all_sessions));
+        .route("/", patch(revoke_all_sessions))
+        .without_v07_checks()
+        .route("/:id", patch(revoke_user_session));
 
     Router::new()
         .route("/", get(health_check))
-        .nest("/users", users_router)
         .nest("/auth", auth_router)
+        .without_v07_checks()
+        .nest("/users", users_router)
         .nest("/sessions", session_router)
         .layer(trace_layer)
         .layer(cors_layer)

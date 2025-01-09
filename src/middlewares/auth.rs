@@ -8,7 +8,6 @@ use crate::{
     utils::AppError,
 };
 use axum::{
-    async_trait,
     extract::FromRequestParts,
     http::{request::Parts, StatusCode},
     RequestPartsExt,
@@ -22,7 +21,6 @@ use axum_extra::{
 /// Middleware extractor that validates the `Authorization: Bearer` header for access tokens.
 ///
 /// If the token is invalid or missing, it returns an `AppError` with a `UNAUTHORIZED` status.
-#[async_trait]
 impl FromRequestParts<AppState> for Claims {
     type Rejection = AppError;
 
@@ -51,7 +49,6 @@ pub struct RefreshClaims(pub Claims);
 /// Middleware extractor that validates the presence and validity of a refresh token stored in cookies.
 ///
 /// If the refresh token is invalid, missing, or expired, returns an `AppError` with `UNAUTHORIZED`.
-#[async_trait]
 impl FromRequestParts<AppState> for RefreshClaims {
     type Rejection = AppError;
 
