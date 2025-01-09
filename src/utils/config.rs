@@ -132,6 +132,7 @@ impl From<&str> for PgSslModeExt {
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = "lowercase")]
 pub enum AppEnvironment {
     Local,
     Production,

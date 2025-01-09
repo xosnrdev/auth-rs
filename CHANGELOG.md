@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update CI workflows to run on nix environment by @xosnrdev
 - Cleanup release workflow by @xosnrdev
 - Consolidate all nix expression into flake.nix by @xosnrdev
-- Refactor project structure and transition to Axum framework by @xosnrdev in [#17](https://github.com/xosnrdev/auth-rs/pull/17)
+- Refactor project structure and transition to Axum framework by @xosnrdev
+  in [#17](https://github.com/xosnrdev/auth-rs/pull/17)
 
 ### Fixed
 
@@ -35,15 +36,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release auth_rs version 1.5.0 by @xosnrdev
 - Cleanup and weekly maintenance by @xosnrdev in [#16](https://github.com/xosnrdev/auth-rs/pull/16)
 - Trim token before converting to string by @xosnrdev
-- Merge pull request #15 from xosnrdev/feature/#12-session-management by @xosnrdev in [#15](https://github.com/xosnrdev/auth-rs/pull/15)
-- Merge pull request #14 from xosnrdev/feature/#10-rate-limiting by @xosnrdev in [#14](https://github.com/xosnrdev/auth-rs/pull/14)
+- Merge pull request #15 from xosnrdev/feature/#12-session-management by @xosnrdev
+  in [#15](https://github.com/xosnrdev/auth-rs/pull/15)
+- Merge pull request #14 from xosnrdev/feature/#10-rate-limiting by @xosnrdev
+  in [#14](https://github.com/xosnrdev/auth-rs/pull/14)
 - Add rate limiting middleware and configuration by @xosnrdev
 - Add rate limiting middleware by @xosnrdev
 - Change token extraction to return a String instead of a &str by @xosnrdev
 - Add RateLimitError conversion to AuthResponse by @xosnrdev
 - Added actix limitation crate for ratelimit setup by @xosnrdev
 - Add RateLimitConfig module and builder by @xosnrdev
-- Merge pull request #13 from xosnrdev/feature/#12-session-management by @xosnrdev in [#13](https://github.com/xosnrdev/auth-rs/pull/13)
+- Merge pull request #13 from xosnrdev/feature/#12-session-management by @xosnrdev
+  in [#13](https://github.com/xosnrdev/auth-rs/pull/13)
 - Add RedisConfig module and builder. by @xosnrdev
 - Add RedisConfig module and builder by @xosnrdev
 - Update Cargo.toml to add redis crate dependency by @xosnrdev
@@ -90,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add email deserialization utility function by @xosnrdev
 - Update AuthResponse, TokenDetails, and ErrorDetails structs by @xosnrdev
 - UpdateEmailDto and UpdatePasswordDto structs by @xosnrdev
-- Remove unneccesary CreateUserDto and LoginDto structs by @xosnrdev
+- Remove unnecessary CreateUserDto and LoginDto structs by @xosnrdev
 - AuthServiceError and add TokenExtractError variant by @xosnrdev
 - Fleshed out FromRequest trait actix web for TokenExtract by @xosnrdev
 - Better auth service handling fleshed out of the box by @xosnrdev
@@ -127,7 +131,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- Removed unneccessary map_err by @xosnrdev
+- Removed unnecessary map_err by @xosnrdev
 - Remove redundant some by @xosnrdev
 
 ## New Contributors
