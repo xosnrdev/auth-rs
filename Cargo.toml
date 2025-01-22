@@ -47,7 +47,7 @@ tower-http = { version = "0.6.2", features = ["cors", "timeout", "trace"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "time"] }
 
-uuid = { version = "1.12.0", features = ["v4", "serde"] }
+uuid = { version = "1.12.1", features = ["v4", "serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
 
 [dev-dependencies]
