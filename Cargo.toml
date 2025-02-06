@@ -29,7 +29,7 @@ chrono = { version = "0.4.39", default-features = false, features = [
 config = "0.15.7"
 dotenvy = "0.15.7"
 getset = "0.1.4"
-jsonwebtoken = "9.3.0"
+jsonwebtoken = "9.3.1"
 serde = { version = "1.0.217", features = ["derive"] }
 sqlx = { version = "0.8.3", default-features = false, features = [
   "runtime-tokio-rustls",
