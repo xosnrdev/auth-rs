@@ -28,7 +28,7 @@ chrono = { version = "0.4.40", default-features = false, features = [
 ] }
 config = "0.15.8"
 dotenvy = "0.15.7"
-getset = "0.1.4"
+getset = "0.1.5"
 jsonwebtoken = "9.3.1"
 serde = { version = "1.0.218", features = ["derive"] }
 sqlx = { version = "0.8.3", default-features = false, features = [
@@ -47,7 +47,7 @@ tower-http = { version = "0.6.2", features = ["cors", "timeout", "trace"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "time"] }
 
-uuid = { version = "1.15.0", features = ["v4", "serde"] }
+uuid = { version = "1.15.1", features = ["v4", "serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
 
 [dev-dependencies]
