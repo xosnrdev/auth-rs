@@ -1,11 +1,13 @@
-mod account;
-mod email_verification_token;
-mod refresh_token;
-mod reset_token;
+//----------------------------------------------------------------------
+// Modules
+//----------------------------------------------------------------------
+
+mod session;
 mod user;
 
-pub use account::*;
-pub use email_verification_token::*;
-pub use refresh_token::*;
-pub use reset_token::*;
+//----------------------------------------------------------------------
+// Exports
+//----------------------------------------------------------------------
+
+pub use session::*;
 pub use user::*;
