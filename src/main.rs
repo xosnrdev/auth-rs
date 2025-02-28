@@ -1,4 +1,11 @@
+use auth_rs::{
+    bootstrap::run_application,
+    utils::{AppResult, CONFIG},
+};
+use dotenvy::dotenv;
+
 #[tokio::main]
-async fn main() {
-    println!("Hello, World!")
+async fn main() -> AppResult<()> {
+    dotenv().ok();
+    run_application(CONFIG.to_owned()).await
 }

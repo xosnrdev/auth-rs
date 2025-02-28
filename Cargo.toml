@@ -1,37 +1,57 @@
 [package]
-name = "authnorization"
-version = "0.1.0"
+name = "auth-rs"
+version = "0.2.0"
 edition = "2021"
 authors = ["Success Kingsley <hello@xosnrdev.tech>"]
-description = "Basic authentication no authorization with rustful actix web"
+description = "A lightweight and modular authentication service proof of concept (PoC) written in Rust."
 license = "MIT"
-
-[lib]
-path = "src/lib.rs"
-
-[[bin]]
-path = "src/main.rs"
-name = "authnorization"
+homepage = "https://github.com/xosnrdev/auth-rs?tab=readme-ov-file#readme"
+repository = "https://github.com/xosnrdev/auth-rs"
 
 [dependencies]
-chrono = { version = "0.4.38", features = ["clock", "serde"] }
-serde = { version = "1.0.210", features = ["derive"] }
-sqlx = { version = "0.8.2", default-features = false, features = [
-    "runtime-tokio-rustls",
-    "macros",
-    "postgres",
-    "uuid",
-    "chrono",
-    "migrate",
+anyhow = "1.0.96"
+argon2 = "0.5.3"
+axum = { version = "0.8.1", features = ["tracing"] }
+axum-extra = { version = "0.10.0", features = [
+  "cookie",
+  "typed-header",
+  "cookie-private",
 ] }
-uuid = { version = "1.10.0", features = ["v4", "serde"] }
-log = "0.4.22"
-tokio = { version = "1.40.0", features = ["macros", "rt-multi-thread"] }
+chrono = { version = "0.4.40", default-features = false, features = [
+  "clock",
+  "serde",
+] }
+config = "0.15.8"
+dotenvy = "0.15.7"
+getset = "0.1.5"
+jsonwebtoken = "9.3.1"
+serde = { version = "1.0.218", features = ["derive"] }
+sqlx = { version = "0.8.3", default-features = false, features = [
+  "runtime-tokio-rustls",
+  "macros",
+  "postgres",
+  "uuid",
+  "chrono",
+  "migrate",
+] }
+time = "0.3.37"
+tokio = { version = "1.43.0", features = ["full"] }
 
+tower = { version = "0.5.2", features = ["buffer", "limit", "util"] }
+tower-http = { version = "0.6.2", features = ["cors", "timeout", "trace"] }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "time"] }
+
+uuid = { version = "1.15.1", features = ["v4", "serde"] }
+validator = { version = "0.20.0", features = ["derive"] }
+
+[dev-dependencies]
+serde_json = "1.0.139"
 
 [profile.release]
+opt-level = 3
+debug = false
+panic = "unwind"
 lto = true
-opt-level = "z"
 codegen-units = 1
-panic = "abort"
 strip = true
