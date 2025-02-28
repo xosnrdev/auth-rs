@@ -4,18 +4,19 @@
 
 use crate::{
     bootstrap::AppState,
+    services::get_session_by_user_id,
     token::{Claims, TokenManager},
     utils::AppError,
 };
 use axum::{
-    extract::FromRequestParts,
-    http::{request::Parts, StatusCode},
     RequestPartsExt,
+    extract::FromRequestParts,
+    http::{StatusCode, request::Parts},
 };
 use axum_extra::{
-    extract::PrivateCookieJar,
-    headers::{authorization::Bearer, Authorization},
     TypedHeader,
+    extract::PrivateCookieJar,
+    headers::{Authorization, authorization::Bearer},
 };
 
 /// Middleware extractor that validates the `Authorization: Bearer` header for access tokens.
@@ -28,6 +29,7 @@ impl FromRequestParts<AppState> for Claims {
         parts: &mut Parts,
         state: &AppState,
     ) -> Result<Self, Self::Rejection> {
+        // Extract and validate bearer token
         let TypedHeader(Authorization(bearer)) = parts
             .extract::<TypedHeader<Authorization<Bearer>>>()
             .await
@@ -37,9 +39,45 @@ impl FromRequestParts<AppState> for Claims {
         let token_manager =
             TokenManager::new(state.get_config().get_jwt().get_secret().as_bytes(), None);
 
-        token_manager
+        // Validate the token format and signature
+        let claims = token_manager
             .validate_access_token(bearer.token())
-            .map_err(|e| AppError::new(StatusCode::UNAUTHORIZED, format!("{}", e)))
+            .map_err(|e| AppError::new(StatusCode::UNAUTHORIZED, format!("{}", e)))?;
+
+        // For admin users, we only check if their own session is valid
+        // This allows them to manage other sessions even if those sessions are revoked
+        if *claims.get_is_admin() {
+            if let Some(session) =
+                get_session_by_user_id(state.get_db_pool(), *claims.get_jti()).await?
+            {
+                if session.is_revoked || session.is_expired() {
+                    return Err(AppError::new(
+                        StatusCode::UNAUTHORIZED,
+                        "Admin session has been revoked or expired",
+                    ));
+                }
+                return Ok(claims);
+            }
+            return Err(AppError::new(
+                StatusCode::UNAUTHORIZED,
+                "Invalid admin session",
+            ));
+        }
+
+        // For non-admin users, check their session as before
+        if let Some(session) =
+            get_session_by_user_id(state.get_db_pool(), *claims.get_jti()).await?
+        {
+            if session.is_revoked || session.is_expired() {
+                return Err(AppError::new(
+                    StatusCode::UNAUTHORIZED,
+                    "Session has been revoked or expired",
+                ));
+            }
+            return Ok(claims);
+        }
+
+        Err(AppError::new(StatusCode::UNAUTHORIZED, "Invalid session"))
     }
 }
 

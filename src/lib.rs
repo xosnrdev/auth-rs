@@ -5,7 +5,7 @@
 pub mod bootstrap;
 pub mod controllers;
 pub mod dto;
-pub mod middlewares;
+pub mod middleware;
 pub mod models;
 pub mod repositories;
 pub mod services;

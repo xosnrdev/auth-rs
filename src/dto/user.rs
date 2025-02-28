@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use validator::Validate;
 
 use crate::models::User;
@@ -23,6 +24,8 @@ pub struct UserReqDto {
 
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct UserResDto {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<Uuid>,
     pub username: String,
     pub email: String,
     pub is_admin: bool,
@@ -33,6 +36,7 @@ pub struct UserResDto {
 impl From<User> for UserResDto {
     fn from(user: User) -> Self {
         UserResDto {
+            id: if user.is_admin { Some(user.id) } else { None },
             username: user.username,
             email: user.email,
             is_admin: user.is_admin,

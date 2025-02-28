@@ -116,21 +116,93 @@ curl -X POST http://127.0.0.1:8080/auth/logout \
 
 ## Session Management
 
-| Method | Endpoint                   | Description                                 |
-| ------ | -------------------------- | ------------------------------------------- |
+| Method | Endpoint           | Description                                          |
+| ------ | ----------------- | ---------------------------------------------------- |
+| GET    | `/sessions`       | List all sessions (admin only).                      |
+| GET    | `/sessions/me`    | List sessions for the current user.                  |
 | POST   | `/sessions/refresh-cookie` | Refresh tokens using a cookie.              |
 | POST   | `/sessions/refresh`        | Refresh tokens using the request body.      |
-| PATCH  | `/sessions/current`        | Revoke the current session.                 |
-| PATCH  | `/sessions/:id`            | Revoke a specific session.                  |
-| PATCH  | `/sessions`                | Revoke all sessions for the logged-in user. |
+| PATCH  | `/sessions/:id`   | Revoke a specific session (admin only).             |
+| PATCH  | `/sessions`       | Revoke all sessions for all users (admin only).      |
 
-### Example Requests for Refresh Token
+### Example Requests for Session Management
+
+- **List All Sessions (Admin Only)**
+
+```bash
+curl -X GET http://127.0.0.1:8080/sessions \
+     -H "Authorization: Bearer <ADMIN_ACCESS_TOKEN>"
+```
+
+Response:
+```json
+{
+  "sessions": [
+    {
+      "id": "0d056fed-cb49-485f-aff6-6975e86df7fb",
+      "userId": "6960b991-4cb0-4960-bcaa-d52d7ca7b395",
+      "isRevoked": false,
+      "expiresAt": "2025-03-01T22:48:41.133705Z",
+      "createdAt": "2025-02-28T22:48:41.133705Z"
+    }
+  ]
+}
+```
+
+- **List Current User's Sessions**
+
+```bash
+curl -X GET http://127.0.0.1:8080/sessions/me \
+     -H "Authorization: Bearer <ACCESS_TOKEN>"
+```
+
+Response:
+```json
+{
+  "sessions": [
+    {
+      "id": "0d056fed-cb49-485f-aff6-6975e86df7fb",
+      "userId": "6960b991-4cb0-4960-bcaa-d52d7ca7b395",
+      "isRevoked": false,
+      "expiresAt": "2025-03-01T22:48:41.133705Z",
+      "createdAt": "2025-02-28T22:48:41.133705Z"
+    }
+  ]
+}
+```
+
+- **Revoke a Specific Session (Admin Only)**
+
+```bash
+curl -X PATCH http://127.0.0.1:8080/sessions/<SESSION_ID> \
+     -H "Authorization: Bearer <ADMIN_ACCESS_TOKEN>"
+```
+
+Response: 204 No Content
+
+- **Revoke All Sessions (Admin Only)**
+
+```bash
+curl -X PATCH http://127.0.0.1:8080/sessions \
+     -H "Authorization: Bearer <ADMIN_ACCESS_TOKEN>"
+```
+
+Response: 204 No Content
+
+### Example Requests for Token Refresh
 
 - **Using Refresh Token Cookie**
 
 ```bash
 curl -X POST http://127.0.0.1:8080/sessions/refresh-cookie \
      --cookie "refreshToken=<REFRESH_TOKEN>"
+```
+
+Response:
+```json
+{
+  "accessToken": "<NEW_ACCESS_TOKEN>"
+}
 ```
 
 - **Using Refresh Token in Request Body**
@@ -141,25 +213,66 @@ curl -X POST http://127.0.0.1:8080/sessions/refresh \
      -d '{"refreshToken": "<REFRESH_TOKEN>"}'
 ```
 
-### Example Requests for Session Management
-
-- **Revoke Current Session**
-
-```bash
-curl -X PATCH http://127.0.0.1:8080/sessions/current \
-     -H "Authorization: Bearer <ACCESS_TOKEN>"
+Response:
+```json
+{
+  "accessToken": "<NEW_ACCESS_TOKEN>"
+}
 ```
 
-- **Revoke a Specific Session (Admin Only)**
+### Error Responses
 
-```bash
-curl -X PATCH http://127.0.0.1:8080/sessions/<USER_ID> \
-     -H "Authorization: Bearer <ADMIN_ACCESS_TOKEN>"
+- **401 Unauthorized**
+```json
+{
+  "message": "Admin session has been revoked or expired",
+  "status": 401
+}
 ```
 
-- **Revoke All Sessions for all Logged-in Users (Admin Only)**
-
-```bash
-curl -X PATCH http://127.0.0.1:8080/sessions \
-     -H "Authorization: Bearer <ADMIN_ACCESS_TOKEN>"
+- **403 Forbidden**
+```json
+{
+  "message": "Access denied: admin privileges required",
+  "status": 403
+}
 ```
+
+- **404 Not Found**
+```json
+{
+  "message": "Session not found",
+  "status": 404
+}
+```
+
+- **409 Conflict**
+```json
+{
+  "message": "Session {id} is already revoked",
+  "status": 409
+}
+```
+
+- **410 Gone**
+```json
+{
+  "message": "Session {id} has expired",
+  "status": 410
+}
+```
+
+### Implementation Notes
+
+1. **Session Uniqueness**: The system enforces a single active session per user. When logging in:
+   - If an active session exists, it will be reused
+   - If the existing session is expired or revoked, it will be deleted and a new one created
+
+2. **Token Types**:
+   - Access Token: Short-lived token for API access
+   - Refresh Token: Long-lived token stored in HTTP-only cookies and database
+
+3. **Security Measures**:
+   - Refresh tokens are stored in HTTP-only, secure cookies with strict same-site policy
+   - Session revocation is permanent and cannot be undone
+   - Admin users can manage other sessions while their own session remains valid

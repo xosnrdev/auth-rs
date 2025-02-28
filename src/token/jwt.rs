@@ -3,7 +3,7 @@
 
 use anyhow::bail;
 use chrono::Duration;
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
 use uuid::Uuid;
 
 use super::{Claims, Typ};

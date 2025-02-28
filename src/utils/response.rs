@@ -3,9 +3,9 @@
 
 use anyhow::Result;
 use axum::{
-    http::{header, HeaderValue, StatusCode},
-    response::{IntoResponse, Response},
     Json,
+    http::{HeaderValue, StatusCode, header},
+    response::{IntoResponse, Response},
 };
 use serde::{Deserialize, Serialize};
 use tracing::error;
@@ -119,6 +119,10 @@ fn add_security_headers(mut response: Response, status: StatusCode) -> Response 
     *response.status_mut() = status;
 
     let headers = response.headers_mut();
+    headers.insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("application/json"),
+    );
     headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
     headers.insert(header::PRAGMA, HeaderValue::from_static("no-cache"));
     headers.insert(

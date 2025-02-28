@@ -2,17 +2,18 @@ use std::{net::SocketAddr, time::Duration};
 
 use anyhow::Context;
 use axum::{
+    BoxError, Router,
     error_handling::HandleErrorLayer,
     extract::FromRef,
     http::{HeaderValue, Method, StatusCode},
     routing::{delete, get, patch, post},
-    serve, BoxError, Router,
+    serve,
 };
 use axum_extra::extract::cookie::Key;
 use getset::Getters;
-use sqlx::{postgres::PgPoolOptions, PgPool};
+use sqlx::{PgPool, postgres::PgPoolOptions};
 use tokio::{net::TcpListener, signal};
-use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
+use tower::{ServiceBuilder, buffer::BufferLayer, limit::RateLimitLayer};
 use tower_http::{cors::CorsLayer, timeout::TimeoutLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -183,27 +184,26 @@ pub fn create_router(db_pool: PgPool, config: AppConfig) -> Router {
         .route("/me", get(get_me))
         .route("/me", patch(update_me))
         .route("/me", delete(delete_me))
-        .without_v07_checks()
-        .route("/:id", get(get_user))
-        .route("/:id", patch(update_user))
-        .route("/:id", delete(delete_user));
+        .route("/{id}", get(get_user))
+        .route("/{id}", patch(update_user))
+        .route("/{id}", delete(delete_user));
 
     let auth_router = Router::new()
         .route("/login", post(login))
         .route("/logout", post(logout));
 
     let session_router = Router::new()
+        .route("/{id}", patch(revoke_user_session))
         .route("/refresh-cookie", post(refresh_session_by_cookie))
         .route("/refresh", post(refresh_session_by_body))
         .route("/current", patch(revoke_my_session))
         .route("/", patch(revoke_all_sessions))
-        .without_v07_checks()
-        .route("/:id", patch(revoke_user_session));
+        .route("/", get(list_all_sessions))
+        .route("/me", get(list_my_sessions));
 
     Router::new()
         .route("/", get(health_check))
         .nest("/auth", auth_router)
-        .without_v07_checks()
         .nest("/users", users_router)
         .nest("/sessions", session_router)
         .layer(trace_layer)

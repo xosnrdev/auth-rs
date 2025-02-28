@@ -68,3 +68,62 @@ pub async fn delete_session_by_user_id(pool: &PgPool, user_id: Uuid) -> AppResul
     .map_err(|e| anyhow!("Unable to delete session ({})", e))?;
     Ok(())
 }
+
+pub async fn get_session_by_id(pool: &PgPool, session_id: Uuid) -> AppResult<Option<Session>> {
+    sqlx::query_as!(
+        Session,
+        r#"
+        SELECT * FROM sessions
+        WHERE id = $1
+        "#,
+        session_id
+    )
+    .fetch_optional(pool)
+    .await
+    .map_err(|e| anyhow!("Unable to get session by ID ({})", e))
+}
+
+pub async fn revoke_session_by_id(pool: &PgPool, session_id: Uuid) -> AppResult<()> {
+    sqlx::query!(
+        r#"
+        UPDATE sessions
+        SET is_revoked = true, updated_at = $1
+        WHERE id = $2
+        "#,
+        Utc::now(),
+        session_id,
+    )
+    .execute(pool)
+    .await
+    .map_err(|e| anyhow!("Unable to revoke session ({})", e))?;
+    Ok(())
+}
+
+pub async fn list_active_sessions(pool: &PgPool) -> AppResult<Vec<Session>> {
+    sqlx::query_as!(
+        Session,
+        r#"
+        SELECT * FROM sessions
+        WHERE is_revoked = false AND expires_at > NOW()
+        ORDER BY created_at DESC
+        "#
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| anyhow!("Unable to list active sessions ({})", e))
+}
+
+pub async fn list_user_active_sessions(pool: &PgPool, user_id: Uuid) -> AppResult<Vec<Session>> {
+    sqlx::query_as!(
+        Session,
+        r#"
+        SELECT * FROM sessions
+        WHERE user_id = $1 AND is_revoked = false AND expires_at > NOW()
+        ORDER BY created_at DESC
+        "#,
+        user_id
+    )
+    .fetch_all(pool)
+    .await
+    .map_err(|e| anyhow!("Unable to list user active sessions ({})", e))
+}

@@ -1,8 +1,8 @@
 use axum::{
+    Json,
     extract::{Path, Query, State},
     http::StatusCode,
     response::IntoResponse,
-    Json,
 };
 use uuid::Uuid;
 use validator::Validate;
@@ -10,17 +10,17 @@ use validator::Validate;
 use crate::{
     bootstrap::AppState,
     dto::{
-        process_optional_fields, GetAllUsersQueryDto, GetAllUsersResDto, PatchReqDto, UserReqDto,
-        UserResDto,
+        GetAllUsersQueryDto, GetAllUsersResDto, PatchReqDto, UserReqDto, UserResDto,
+        process_optional_fields,
     },
-    middlewares::auth::check_admin,
+    middleware::check_admin,
     models::User,
     services::{
         self, get_user_by_email, get_user_by_github_id, get_user_by_id, get_user_by_username,
         get_user_by_username_or_email,
     },
     token::Claims,
-    utils::{hash_password, AppError, SuccessResponse},
+    utils::{AppError, SuccessResponse, hash_password},
 };
 
 pub async fn register(
@@ -146,38 +146,37 @@ async fn handle_patch_updates(
 
     if dto.username.is_some() {
         let username = dto.username.unwrap_or_default();
-        if get_user_by_username(state.get_db_pool(), &username)
-            .await?
-            .is_some()
-        {
-            return Err(AppError::new(
-                StatusCode::CONFLICT,
-                "Username already exists",
-            ));
+        if let Some(existing_user) = get_user_by_username(state.get_db_pool(), &username).await? {
+            if existing_user.id != user_id {
+                return Err(AppError::new(
+                    StatusCode::CONFLICT,
+                    "Username already exists",
+                ));
+            }
         }
         user.username = username;
     }
 
     if dto.email.is_some() {
         let email = dto.email.unwrap_or_default();
-        if get_user_by_email(state.get_db_pool(), &email)
-            .await?
-            .is_some()
-        {
-            return Err(AppError::new(StatusCode::CONFLICT, "Email already exists"));
+        if let Some(existing_user) = get_user_by_email(state.get_db_pool(), &email).await? {
+            if existing_user.id != user_id {
+                return Err(AppError::new(StatusCode::CONFLICT, "Email already exists"));
+            }
         }
         user.email = email;
     }
 
     if dto.github_id.is_some() {
-        if get_user_by_github_id(state.get_db_pool(), dto.github_id.unwrap())
-            .await?
-            .is_some()
+        if let Some(existing_user) =
+            get_user_by_github_id(state.get_db_pool(), dto.github_id.unwrap()).await?
         {
-            return Err(AppError::new(
-                StatusCode::CONFLICT,
-                "GitHub ID already exists",
-            ));
+            if existing_user.id != user_id {
+                return Err(AppError::new(
+                    StatusCode::CONFLICT,
+                    "GitHub ID already exists",
+                ));
+            }
         }
         user.github_id = dto.github_id;
     }

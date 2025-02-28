@@ -1,16 +1,16 @@
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use axum_extra::extract::PrivateCookieJar;
 use chrono::Duration;
 use validator::Validate;
 
 use crate::{
     bootstrap::AppState,
-    dto::{process_optional_fields, LoginReqDto, LoginResDto},
+    dto::{LoginReqDto, LoginResDto, process_optional_fields},
     models::Session,
     repositories::{create_session, delete_session_by_user_id},
     services::{get_session_by_user_id, get_user_by_username_or_email},
     token::{Claims, TokenManager},
-    utils::{check_password, AppError, SuccessResponse},
+    utils::{AppError, SuccessResponse, check_password},
 };
 
 use super::create_cookie_session;

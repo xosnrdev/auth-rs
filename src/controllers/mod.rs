@@ -11,7 +11,11 @@ pub use user::*;
 
 pub(super) fn create_cookie_session(refresh_token: impl Into<String>, ttl: i64) -> Cookie<'static> {
     let now = time::OffsetDateTime::now_utc();
-    let max_age = time::Duration::seconds(ttl - now.unix_timestamp());
+    let max_age = if ttl <= 0 {
+        time::Duration::seconds(0)
+    } else {
+        time::Duration::seconds(ttl - now.unix_timestamp())
+    };
     Cookie::build(("refresh_token", refresh_token.into()))
         .http_only(true)
         .secure(true)
