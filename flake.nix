@@ -14,60 +14,54 @@
 
         manifest = pkgs.lib.importTOML ./Cargo.toml;
         package = manifest.package;
-        rustApp = pkgs.rustPlatform.buildRustPackage {
-          pname = package.name;
-          version = package.version;
-          src = pkgs.lib.cleanSource ./.;
-          cargoLock.lockFile = ./Cargo.lock;
-
-          checkFlags = [
-            # Skip tests that require a running Postgres instance
-            "--skip=test_health_check"
-            "--skip=test_user"
-          ];
-          meta = with pkgs.lib; {
-            inherit (package) description homepage repository;
-            license = licenses.mit;
-            maintainers = [ maintainers.xosnrdev ];
-          };
-        };
+        # rustApp = pkgs.rustPlatform.buildRustPackage {
+        #   pname = package.name;
+        #   version = package.version;
+        #   src = pkgs.lib.cleanSource ./.;
+        #   cargoLock.lockFile = ./Cargo.lock;
+        #   meta = with pkgs.lib; {
+        #     inherit (package) description homepage repository;
+        #     license = licenses.mit;
+        #     maintainers = [ maintainers.xosnrdev ];
+        #   };
+        # };
 
         # Image author
-        author = "xosnrdev";
+        # author = "xosnrdev";
         # Container registry
-        registry = "ghcr.io";
+        # registry = "ghcr.io";
 
         # Conditionally build Docker image only on Linux
         # (dockerTools can break on macOS, or cause flake check issues).
-        dockerImage = if pkgs.stdenv.isLinux then
-          pkgs.dockerTools.buildImage {
-            name = "${registry}/${author}/${rustApp.pname}-rs";
-            tag = rustApp.version;
-            created = "now";
+        # dockerImage = if pkgs.stdenv.isLinux then
+        #   pkgs.dockerTools.buildImage {
+        #     name = "${registry}/${author}/${rustApp.pname}-rs";
+        #     tag = rustApp.version;
+        #     created = "now";
 
-            config = {
-              Env = [
-                "RUST_LOG=info"
-                "APP__SERVER__HOST=0.0.0.0"
-                "APP__SERVER__PORT=8080"
-              ];
-              Cmd = [ "${rustApp}/bin/${rustApp.pname}" ];
-              Labels = {
-                "org.opencontainers.image.title" = "${rustApp.pname}-rs";
-                "org.opencontainers.image.version" = rustApp.version;
-                "org.opencontainers.image.description" =
-                  rustApp.meta.description;
-                "org.opencontainers.image.documentation" =
-                  rustApp.meta.homepage;
-                "org.opencontainers.image.authors" = author;
-                "org.opencontainers.image.source" = rustApp.meta.repository;
-                "org.opencontainers.image.licenses" = "MIT";
-              };
-            };
-          }
-        else
-        # If not Linux, set this to null so we can skip it.
-          null;
+        #     config = {
+        #       Env = [
+        #         "RUST_LOG=info"
+        #         "APP__SERVER__HOST=0.0.0.0"
+        #         "APP__SERVER__PORT=8080"
+        #       ];
+        #       Cmd = [ "${rustApp}/bin/${rustApp.pname}" ];
+        #       Labels = {
+        #         "org.opencontainers.image.title" = "${rustApp.pname}-rs";
+        #         "org.opencontainers.image.version" = rustApp.version;
+        #         "org.opencontainers.image.description" =
+        #           rustApp.meta.description;
+        #         "org.opencontainers.image.documentation" =
+        #           rustApp.meta.homepage;
+        #         "org.opencontainers.image.authors" = author;
+        #         "org.opencontainers.image.source" = rustApp.meta.repository;
+        #         "org.opencontainers.image.licenses" = "MIT";
+        #       };
+        #     };
+        #   }
+        # else
+        # # If not Linux, set this to null so we can skip it.
+        #   null;
 
         devShell = pkgs.mkShell {
           buildInputs = [
@@ -128,12 +122,12 @@
         };
 
       in {
-        packages = if dockerImage == null then {
-          default = rustApp;
-        } else {
-          default = rustApp;
-          docker = dockerImage;
-        };
+        # packages = if dockerImage == null then {
+        #   default = rustApp;
+        # } else {
+        #   default = rustApp;
+        #   docker = dockerImage;
+        # };
 
         formatter = pkgs.nixfmt-classic;
         devShells.default = devShell;

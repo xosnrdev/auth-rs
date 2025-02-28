@@ -4,47 +4,50 @@ A lightweight and modular authentication service proof of concept (PoC) written 
 
 ## Features
 
-- JWT-based authentication with access and refresh token support.
-- Secure password hashing for user accounts.
-- Role-based access control (RBAC) with support for admin and user roles.
-- Revocable session management with token expiration handling.
-- Middleware for CORS, rate limiting, and timeouts for production-ready APIs.
-- Comprehensive configuration options for server, database, and environment settings.
+[x] JWT Authentication
+   - Access and refresh tokens
+   - Role-based access control
+   - Session management
+
+[x] Security
+   - Password hashing
+   - Token expiration
+   - Session revocation
+   - CORS middleware
+   - Rate limiting
+   - Request timeouts
+   - Environment config
 
 ## Requirements
 
-- [Rust](https://www.rust-lang.org/tools/install) 
-- [Nix](https://determinate.systems/nix-installer/) for our reproducible development environment.
-- [Docker](https://www.docker.com/) for spinning up a PostgreSQL instance.
+- [Rust](https://www.rust-lang.org/tools/install) 1.85.0 or later (using Rust 2024 edition)
+- [Nix](https://determinate.systems/nix-installer/) for reproducible development environment
+- [Docker](https://www.docker.com/) for PostgreSQL database
 
-## General Workflow
+## Quick Start
 
-### Setup Environment
-
-1. Enter the Development Shell:
-   Run the following command to bootstrap everything:
-
+1. Enter development shell:
    ```bash
    nix develop
    ```
 
-2. Run the Development Server:
-   After entering the shell, start the application:
-
+2. Start the server:
    ```bash
    cargo run
    ```
+   Server runs at `http://127.0.0.1:8080` by default.
 
-   The server will be accessible at `http://127.0.0.1:8080` by default.
+## Configuration
 
-### Environment Variables
+Copy `.env.example` to `.env` and adjust the values:
+```bash
+cp .env.example .env
+```
 
-See the [.env.example](.env.example) file for a list of configurable environment variables.
+## Documentation
 
-## API Documentation
-
-See the [API Documentation](docs/API.md) for a list of available endpoints and example requests.
+- [API Documentation](docs/API.md) - Available endpoints and examples
 
 ## License
 
-Availabe under [MIT](LICENSE) at your option.
+[MIT](LICENSE)
