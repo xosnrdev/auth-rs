@@ -10,13 +10,14 @@ pub use session::*;
 pub use user::*;
 
 pub(super) fn create_cookie_session(refresh_token: impl Into<String>, ttl: i64) -> Cookie<'static> {
-    let max_age = time::Duration::seconds(ttl);
+    let now = time::OffsetDateTime::now_utc();
+    let max_age = time::Duration::seconds(ttl - now.unix_timestamp());
     Cookie::build(("refresh_token", refresh_token.into()))
         .http_only(true)
         .secure(true)
         .same_site(SameSite::Strict)
         .path("/")
         .max_age(max_age)
-        .expires(time::OffsetDateTime::now_utc() + max_age)
+        .expires(now + max_age)
         .build()
 }

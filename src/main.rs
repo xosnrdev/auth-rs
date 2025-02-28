@@ -1,8 +1,9 @@
+use dotenvy::dotenv;
+
 use auth_rs::{
     bootstrap::run_application,
     utils::{AppResult, CONFIG},
 };
-use dotenvy::dotenv;
 
 #[tokio::main]
 async fn main() -> AppResult<()> {

@@ -15,7 +15,7 @@ pub async fn health_check() -> Result<SuccessResponse<ServiceInfo>, AppError> {
     let body = ServiceInfo {
         name: "auth-rs".to_string(),
         version: VERSION.to_string(),
-        description: "Auth Service PoC in Rust".to_string(),
+        description: "A lightweight and modular authentication service proof of concept (PoC) written in Rust".to_string(),
     };
     Ok(SuccessResponse::ok(body))
 }
